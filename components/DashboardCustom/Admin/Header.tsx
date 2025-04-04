@@ -1,63 +1,95 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, Menu } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useMediaQuery } from "@/hooks/useMobile"
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Bell, ChevronLeft, HelpCircle, LogOut, Menu, Moon, Settings, Sun, User } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useMediaQuery } from "@/hooks/useMobile";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { useTheme } from "next-themes";
 
 interface HeaderProps {
-  title?: string
-  onMenuClick?: () => void
-  showMenuButton?: boolean
-  actions?: React.ReactNode
-  className?: string
-  mobileOpen?: boolean
-  setMobileOpen?: (open: boolean) => void
-  collapsed?: boolean
-  setCollapsed?: (collapsed: boolean) => void
+  onMenuClick?: () => void;
+  showMenuButton?: boolean;
+
+  className?: string;
+  mobileOpen?: boolean;
+  setMobileOpen?: (open: boolean) => void;
+  collapsed?: boolean;
+  setCollapsed?: (collapsed: boolean) => void;
 }
 
 const Header = ({
-  title = "Dashboard",
   onMenuClick,
   showMenuButton = true,
-  actions,
   className,
   mobileOpen = false,
   setMobileOpen,
   collapsed = false,
   setCollapsed,
 }: HeaderProps) => {
-  const [internalCollapsed, setInternalCollapsed] = useState(collapsed)
-  const isMobile = useMediaQuery("(max-width: 768px)")
-  console.log("Action Check", actions)
+  const [internalCollapsed, setInternalCollapsed] = useState(collapsed);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [notificationCount, setNotificationCount] = useState(3);
+  const { theme, setTheme } = useTheme()
+
 
   // Sync internal state with props
   useEffect(() => {
-    setInternalCollapsed(collapsed)
-  }, [collapsed])
+    setInternalCollapsed(collapsed);
+  }, [collapsed]);
 
   const toggleCollapse = () => {
     if (setCollapsed) {
-      setCollapsed(!collapsed)
+      setCollapsed(!collapsed);
     } else {
-      setInternalCollapsed(!internalCollapsed)
+      setInternalCollapsed(!internalCollapsed);
     }
-  }
+  };
 
   const toggleMobile = () => {
     if (setMobileOpen) {
-      setMobileOpen(!mobileOpen)
+      setMobileOpen(!mobileOpen);
     }
-  }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   return (
-    <header className={cn("flex h-16 items-center justify-between border-b bg-white px-6", className)}>
+    <header
+      className={cn(
+        "flex h-16 items-center justify-between border-b bg-white px-6",
+        className
+      )}
+    >
       <div className="flex items-center gap-4">
         {isMobile && (
-          <Button variant="ghost" size="icon" onClick={onMenuClick} className="md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMenuClick}
+            className="md:hidden"
+          >
             <Menu className="h-5 w-5" />
           </Button>
         )}
@@ -67,20 +99,124 @@ const Header = ({
           size="sm"
           onClick={toggleCollapse}
           className={cn(
-            "h-6 w-6 rounded-full text-red-700 border border-slate-600 bg-slate-800 p-0 hidden md:flex cursor-pointer",
-            collapsed ? "rotate-180" : "",
+            "h-8 w-8 bg-gray-100 text-slate-700 p-0 hidden md:flex cursor-pointer",
+            collapsed ? "rotate-180" : ""
           )}
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-6 w-6" />
         </Button>
 
-        <h2 className="text-lg font-semibold">{title}</h2>
+        <div>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/components">Order</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>View</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
       </div>
 
-      {actions && <div className="flex items-center gap-4">{actions}</div>}
+     
+        <div className="flex items-center gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative bg-gray-100 cursor-pointer">
+                <Bell className="h-5 w-5" />
+                {notificationCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500 text-white">
+                    {notificationCount}
+                  </Badge>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {[...Array(3)].map((_, i) => (
+                <DropdownMenuItem
+                  key={i}
+                  className="flex flex-col items-start py-2"
+                >
+                  <div className="font-medium">New order received</div>
+                  <div className="text-xs text-muted-foreground">
+                    Order #{1000 + i} has been placed
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {i + 1} hour{i !== 0 ? "s" : ""} ago
+                  </div>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="justify-center font-medium">
+                View all notifications
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Theme Toggle */}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className=" bg-gray-100 cursor-pointer">
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
+
+          {/* Profile Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full cursor-pointer">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={"https://cdn-icons-png.flaticon.com/128/2202/2202112.png"} alt={"admin"} />
+                  <AvatarFallback>{"Admin back"}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {
+                    "admin name"
+                    }
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {"admin email"}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <HelpCircle className="mr-2 h-4 w-4" />
+                <span>Help</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-red-500">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
-
+export default Header;

@@ -17,6 +17,12 @@ interface SidebarProps {
     label: string
     href?: string
     active?: boolean
+    subItems?: {
+      icon: React.ElementType
+      label: string
+      href?: string
+      active?: boolean
+    }[]
   }[]
   user?: {
     name: string
@@ -54,6 +60,13 @@ const Sidebar = ({
     setInternalCollapsed(collapsed)
   }, [collapsed])
 
+//   const toggleCollapse = () => {
+//     if (setCollapsed) {
+//       setCollapsed(!collapsed)
+//     } else {
+//       setInternalCollapsed(!internalCollapsed)
+//     }
+//   }
 
   const toggleMobile = () => {
     if (setMobileOpen) {
@@ -93,6 +106,20 @@ const Sidebar = ({
             </Button>
           )}
         </div>
+
+        {/* Collapse Toggle Button */}
+        {/* <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleCollapse}
+          className={cn(
+            "absolute -right-3 top-20 z-10 h-6 w-6 rounded-full text-red-700 border border-slate-600 bg-slate-800 p-0 hidden md:flex",
+            isCollapsed ? "rotate-180" : "",
+          )}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button> */}
+
         {/* Scrollable Sidebar Content */}
         <ScrollArea className="h-[calc(100vh-4rem)]">
           <div className={cn("py-4", isCollapsed ? "px-1" : "px-3")}>
@@ -105,6 +132,7 @@ const Sidebar = ({
                   active={route.active}
                   collapsed={isCollapsed}
                   href={route.href}
+                  subItems={route.subItems}
                 />
               ))}
             </div>
