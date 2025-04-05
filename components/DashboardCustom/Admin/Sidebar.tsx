@@ -1,41 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ChevronLeft, BarChart3 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useMediaQuery } from "@/hooks/useMobile"
-import { TooltipProvider } from "@/components/ui/tooltip"
-import SidebarItem from "./AdminSideBar"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ChevronLeft, BarChart3 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useMediaQuery } from "@/hooks/useMobile";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import SidebarItem from "./AdminSideBar";
+import { usePathname } from "next/navigation";
 
 interface SidebarProps {
   routes: {
-    icon: React.ElementType
-    label: string
-    href?: string
-    active?: boolean
+    icon: React.ElementType;
+    label: string;
+    href?: string;
+    active?: boolean;
     subItems?: {
-      icon: React.ElementType
-      label: string
-      href?: string
-      active?: boolean
-    }[]
-  }[]
+      icon: React.ElementType;
+      label: string;
+      href?: string;
+      active?: boolean;
+    }[];
+  }[];
   user?: {
-    name: string
-    email: string
-    image?: string
-    fallback?: string
-  }
-  title?: string
-  logo?: React.ReactNode
-  mobileOpen?: boolean
-  setMobileOpen?: (open: boolean) => void
-  collapsed?: boolean
-  setCollapsed?: (collapsed: boolean) => void
+    name: string;
+    email: string;
+    image?: string;
+    fallback?: string;
+  };
+  title?: string;
+  logo?: React.ReactNode;
+  mobileOpen?: boolean;
+  setMobileOpen?: (open: boolean) => void;
+  collapsed?: boolean;
+  setCollapsed?: (collapsed: boolean) => void;
 }
 
 const Sidebar = ({
@@ -52,30 +53,43 @@ const Sidebar = ({
   collapsed = false,
   setCollapsed,
 }: SidebarProps) => {
-  const [internalCollapsed, setInternalCollapsed] = useState(collapsed)
-  const isMobile = useMediaQuery("(max-width: 768px)")
+  const [internalCollapsed, setInternalCollapsed] = useState(collapsed);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const pathname = usePathname();
 
-  // Sync internal state with props
+  const processedRoutes = routes.map((route) => {
+    const isRouteActive = pathname === route.href;
+
+    let hasActiveChild = false;
+    const processedSubItems = route.subItems?.map((subItem) => {
+      const isSubItemActive = pathname === subItem.href;
+      if (isSubItemActive) {
+        hasActiveChild = true;
+      }
+      return {
+        ...subItem,
+        active: isSubItemActive,
+      };
+    });
+
+    return {
+      ...route,
+      active: isRouteActive || hasActiveChild,
+      subItems: processedSubItems,
+    };
+  });
+
   useEffect(() => {
-    setInternalCollapsed(collapsed)
-  }, [collapsed])
-
-//   const toggleCollapse = () => {
-//     if (setCollapsed) {
-//       setCollapsed(!collapsed)
-//     } else {
-//       setInternalCollapsed(!internalCollapsed)
-//     }
-//   }
+    setInternalCollapsed(collapsed);
+  }, [collapsed]);
 
   const toggleMobile = () => {
     if (setMobileOpen) {
-      setMobileOpen(!mobileOpen)
+      setMobileOpen(!mobileOpen);
     }
-  }
+  };
 
-  // Use either controlled or internal state
-  const isCollapsed = setCollapsed ? collapsed : internalCollapsed
+  const isCollapsed = setCollapsed ? collapsed : internalCollapsed;
 
   return (
     <TooltipProvider>
@@ -83,14 +97,14 @@ const Sidebar = ({
         className={cn(
           "fixed inset-y-0 left-0 z-50 bg-slate-800 text-white transition-all duration-300 ease-in-out md:relative md:translate-x-0",
           isMobile && !mobileOpen ? "-translate-x-full" : "translate-x-0",
-          isCollapsed ? "w-16" : "w-64",
+          isCollapsed ? "w-16" : " w-56 2xl:w-64"
         )}
       >
         {/* Sidebar Header */}
         <div
           className={cn(
             "flex h-16 items-center border-b border-slate-700",
-            isCollapsed ? "justify-center px-0" : "justify-between px-4",
+            isCollapsed ? "justify-center px-0" : "justify-between px-4"
           )}
         >
           {!isCollapsed && (
@@ -101,30 +115,20 @@ const Sidebar = ({
           )}
           {isCollapsed && logo}
           {isMobile && !isCollapsed && (
-            <Button variant="ghost" size="icon" onClick={toggleMobile} className="md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMobile}
+              className="md:hidden"
+            >
               <ChevronLeft className="h-5 w-5" />
             </Button>
           )}
         </div>
-
-        {/* Collapse Toggle Button */}
-        {/* <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleCollapse}
-          className={cn(
-            "absolute -right-3 top-20 z-10 h-6 w-6 rounded-full text-red-700 border border-slate-600 bg-slate-800 p-0 hidden md:flex",
-            isCollapsed ? "rotate-180" : "",
-          )}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button> */}
-
-        {/* Scrollable Sidebar Content */}
         <ScrollArea className="h-[calc(100vh-4rem)]">
           <div className={cn("py-4", isCollapsed ? "px-1" : "px-3")}>
             <div className="space-y-1">
-              {routes.map((route, index) => (
+              {processedRoutes?.map((route, index) => (
                 <SidebarItem
                   key={index}
                   icon={route.icon}
@@ -144,7 +148,7 @@ const Sidebar = ({
           <div
             className={cn(
               "absolute bottom-0 w-full border-t border-slate-700",
-              isCollapsed ? "p-2 flex justify-center" : "p-4",
+              isCollapsed ? "p-2 flex justify-center" : "p-4"
             )}
           >
             {isCollapsed ? (
@@ -168,8 +172,7 @@ const Sidebar = ({
         )}
       </aside>
     </TooltipProvider>
-  )
-}
+  );
+};
 
-export default Sidebar
-
+export default Sidebar;

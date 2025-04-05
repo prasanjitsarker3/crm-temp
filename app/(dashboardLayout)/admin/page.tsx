@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -5,8 +6,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useAppDispatch } from "@/redux/hooks";
+import { setBreadcrumbs } from "@/redux/Slice/breadcrumbSlice";
+import { useEffect } from "react";
 
 export default function AdminDashboardPage() {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(
+      setBreadcrumbs([{ label: "Dashboard", active: true, path: "/admin" }])
+    );
+  }, [dispatch]);
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Dashboard Overview</h1>
@@ -116,3 +127,29 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+
+// const UserPage = () => {
+//   const dispatch = useAppDispatch();
+
+//   useEffect(() => {
+//     dispatch(setBreadcrumbs([{ label: "Users", active: true,path:"/admin/users" }]));
+//   }, [dispatch]);
+//   return <div>User Page</div>;
+// };
+// export default UserPage;
+
+// const UserPageView = () => {
+//   const dispatch = useAppDispatch();
+//   const { userId } = useParams();
+
+//   useEffect(() => {
+//     dispatch(
+//       setBreadcrumbs([
+//         { label: "Users", active: true, path:"/admin/users" },
+//         { label: "User Details", active: true, path:`/admin/users/${userId}` },
+//       ])
+//     );
+//   }, [dispatch]);
+//   return <div>User Page</div>;
+// };
+// export default UserPageView;
