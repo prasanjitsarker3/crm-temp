@@ -1,5 +1,4 @@
 "use client";
-
 import { adminRoutes } from "@/components/DashboardCustom/Admin/admin.routes";
 import Header from "@/components/DashboardCustom/Admin/Header";
 import Sidebar from "@/components/DashboardCustom/Admin/Sidebar";
@@ -15,11 +14,10 @@ const AdminCustomLayout = ({ children }: AdminLayoutProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
-
   const toggleMobileSidebar = () => setMobileOpen(!mobileOpen);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-50  dark:bg-black dark:text-white">
       {/* Sidebar */}
       <Sidebar
         routes={adminRoutes()}

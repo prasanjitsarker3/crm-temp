@@ -66,7 +66,6 @@ const Header = ({
     (state: RootState) => state.breadcrumb.breadcrumbs
   );
 
-  // Sync internal state with props
   useEffect(() => {
     setInternalCollapsed(collapsed);
   }, [collapsed]);
@@ -79,12 +78,6 @@ const Header = ({
     }
   };
 
-  const toggleMobile = () => {
-    if (setMobileOpen) {
-      setMobileOpen(!mobileOpen);
-    }
-  };
-
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
@@ -92,7 +85,7 @@ const Header = ({
   return (
     <header
       className={cn(
-        "flex h-16 items-center justify-between border-b bg-white px-6",
+        "flex h-16 items-center justify-between border-b bg-white dark:bg-black dark:text-white px-6",
         className
       )}
     >
